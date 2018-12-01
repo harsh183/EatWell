@@ -19,9 +19,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * to do: test getCalendar
+     * gets calendar and turns it into one long string
      * @param name
-     * @return
+     * @return name in string form
      */
     public String getCalendar(String name) {
         //when calling get calendar ask for file name
@@ -33,8 +33,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
+    /**
+     *
+     */
+     public String writeToCalendar(String calendarId) {
+         Event meal = new Event;
+         .setSummary("Eat well!"); //insert name of meal - will figure out how to get it later
+         //import start time and date from calculator
+         DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
+         EventDateTime start = new EventDateTime()
+                 .setDateTime(startDateTime)
+                 .setTimeZone("America/Chicago"); //add time zone support
+         meal.setStart(start);
+         //import end time and date
+         DateTime endDateTime = new DateTime("2015-05-28T17:00:00-07:00");
+         EventDateTime end = new EventDateTime()
+                 .setDateTime(endDateTime)
+                 .setTimeZone("America/Chicago");
+         event.setEnd(end);
+         //handle recurrence once we decide when we are eating
+         String[] recurrence = new String[] {"RRULE:FREQ=NONE;COUNT=0"};
+         event.setRecurrence(Arrays.asList(recurrence));
+     }
 
     /**
      * Extracts the data out of the ical text into a 2d ArrayList.
