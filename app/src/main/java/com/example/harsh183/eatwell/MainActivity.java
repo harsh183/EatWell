@@ -4,6 +4,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import com.google.api.services.calendar.Calendar;
 
 //best project ever
 
@@ -35,8 +36,13 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      *
+     * @param calendarId
+     * @return should add event
      */
      public String writeToCalendar(String calendarId) {
+         Calendar service = new Calendar.Builder(httpTransport, jsonFactory, credentials)
+                 .setApplicationName("applicationName").build();
+
          Event meal = new Event;
          .setSummary("Eat well!"); //insert name of meal - will figure out how to get it later
          //import start time and date from calculator
@@ -50,10 +56,13 @@ public class MainActivity extends AppCompatActivity {
          EventDateTime end = new EventDateTime()
                  .setDateTime(endDateTime)
                  .setTimeZone("America/Chicago");
-         event.setEnd(end);
+         meal.setEnd(end);
          //handle recurrence once we decide when we are eating
          String[] recurrence = new String[] {"RRULE:FREQ=NONE;COUNT=0"};
-         event.setRecurrence(Arrays.asList(recurrence));
+         meal.setRecurrence(Arrays.asList(recurrence));
+         meal = service.events().insert(calendarId, meal).execute();
+         System.out.print("Event created: %s\n", meal.getHtmlLink());
+         POST http://www.google.com/calendar/feeds/jo@gmail.com/private/full
      }
 
     /**
