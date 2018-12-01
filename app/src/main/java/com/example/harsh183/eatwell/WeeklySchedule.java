@@ -45,7 +45,7 @@ class WeeklySchedule {
     public WeeklySchedule() {
         schedule = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-           schedule.add(new ArrayList<StudentEvent>());
+            schedule.add(new ArrayList<StudentEvent>());
         }
     }
 
@@ -69,6 +69,7 @@ class WeeklySchedule {
      * @return
      */
     private int mapWeekDaysToArrayIndex(String weekday) {
+        weekday = weekday.trim();
         String[] weekdays = {"MO", "TU", "WE", "TH", "FR"};
         // TODO: This is linear search, replace
         for (int i = 0; i < weekdays.length; i++) {

@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         boolean foundEvent = false;
         for (String line: lines) {
             if (line.contains("BEGIN:VEVENT")) {
+                currentEvent = new StudentEvent();
                 foundEvent = true;
             }
 
@@ -68,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
             if (foundEvent) {
                 // Start time
                 if (line.contains("DTSTART;")) {
-                    String startTime = line.substring(line.length() - 6); // Last six chars
+                    String startTime = line.substring(line.length() - 7); // Last six chars
                     currentEvent.startTime = convertStringToLocalTime(startTime);
                 }
 
                 // End time
                 if (line.contains("DTEND;")) {
-                    String endTime = line.substring(line.length() - 6); // Last six chars
+                    String endTime = line.substring(line.length() - 7); // Last six chars
                     currentEvent.endTime = convertStringToLocalTime(endTime);
                 }
 
@@ -107,8 +108,7 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O) // TODO: Do something about this
     private LocalTime convertStringToLocalTime(String time) {
         int hourTime = Integer.parseInt(time.substring(0, 2));
-        int minuteTime = Integer.parseInt(time.substring(0, 4));
-        LocalTime timeObject = LocalTime.of(hourTime, minuteTime, 0);
-        return timeObject;
+        int minuteTime = Integer.parseInt(time.substring(2, 4));
+        return LocalTime.of(hourTime, minuteTime, 0);
     }
 }
