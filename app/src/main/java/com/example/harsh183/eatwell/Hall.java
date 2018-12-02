@@ -1,8 +1,22 @@
 package com.example.harsh183.eatwell;
 
+/**
+ * Class that hold information about halls and their meal timings
+ */
+
 public class Hall {
 
     private class MealTimings {
+        private String mealName;
+        private int startTime;
+        private int endTime;
+
+        public MealTimings(String mealName, int startTime, int endTime) {
+            this.mealName = mealName;
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
         public String getMealName() {
             return mealName;
         }
@@ -24,16 +38,6 @@ public class Hall {
         }
 
         public void setEndTime(int endTime) {
-            this.endTime = endTime;
-        }
-
-        private String mealName;
-        private int startTime;
-        private int endTime;
-
-        public MealTimings(String mealName, int startTime, int endTime) {
-            this.mealName = mealName;
-            this.startTime = startTime;
             this.endTime = endTime;
         }
     }
