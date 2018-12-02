@@ -1,0 +1,40 @@
+apply plugin: 'com.android.library'
+
+ext {
+    PUBLISH_GROUP_ID = 'com.adityak'
+    PUBLISH_ARTIFACT_ID = 'browsemyfiles'
+    PUBLISH_VERSION = '1.7'
+}
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        //applicationId "com.aditya.filebrowser"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 9
+        versionName "1.7"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'          /*
+    Error:(31, 20) When using a `compileSdkVersion` android-O revision 2 or higher, the support library version should be 26.0.0-beta1 or higher (was 25.3.0)*/
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.beardedhen:androidbootstrap:2.3.1'
+    implementation 'com.roughike:bottom-bar:2.3.1'
+    implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.14'
+    implementation files('libs/commons-io-2.5.jar')
+}
+
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
