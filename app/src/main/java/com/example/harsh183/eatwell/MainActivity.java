@@ -1,10 +1,15 @@
 package com.example.harsh183.eatwell;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import com.google.api.services.calendar.Calendar;
+import android.view.View;
+import android.widget.Button;
+
+//import com.google.api.services.calendar.Calendar;
 
 //best project ever
 
@@ -13,10 +18,25 @@ import java.time.LocalTime;
 
 public class MainActivity extends AppCompatActivity {
 
+    Button browseFilesButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        browseFilesButton = findViewById(R.id.browse_button);
+        browseFilesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("file/*");
+                startActivity(intent);
+            }
+        });
+
     }
 
     /**
@@ -39,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
      * @param calendarId
      * @return should add event
      */
-     public String writeToCalendar(String calendarId) {
+     /*public String writeToCalendar(String calendarId) {
          Calendar service = new Calendar.Builder(httpTransport, jsonFactory, credentials)
                  .setApplicationName("applicationName").build();
 
@@ -63,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
          meal = service.events().insert(calendarId, meal).execute();
          System.out.print("Event created: %s\n", meal.getHtmlLink());
          POST http://www.google.com/calendar/feeds/jo@gmail.com/private/full
-     }
+     }*/
 
     /**
      * Extracts the data out of the ical text into a 2d ArrayList.
