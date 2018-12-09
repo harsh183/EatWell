@@ -13,6 +13,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -75,6 +82,13 @@ import java.time.LocalTime;
 public class MainActivity extends AppCompatActivity {
 
     Button browseFilesButton;
+    private String calendarId;
+    private String icsFile;
+    /** Default logging tag for messages from the main activity. */
+    private static final String TAG = "Lab12:Main";
+
+    /** Request queue for our network requests. */
+    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,20 +108,40 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    public String getCalendar(String calendarId) {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url =
-        StringRequest newRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>());
-        queue.add(newRequest);
-        return
+    void startAPICall() {
+        try {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.GET,
+                    "https://www.googleapis.com/calendar/" + calendarId + "/events",
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(final JSONObject response) {
+                            Log.d(TAG, response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(final VolleyError error) {
+                    Log.w(TAG, error.toString());
+                }
+            });
+            requestQueue.add(jsonObjectRequest);
+            icsFile = jsonObjectRequest.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    public String getCalendar(String calendarIdInput) {
+        calendarId = calendarIdInput;
+        startAPICall();
+        return icsFile;
     }
 
     /**
      * writes new event to the user's calendar using calculated times and dates
      * @param calendarId
      * @return should add event
-
      public String writeToCalendar(String calendarId) {
          Calendar service = new Calendar.Builder(httpTransport, jsonFactory, credentials)
                  .setApplicationName("applicationName").build();
@@ -131,8 +165,39 @@ public class MainActivity extends AppCompatActivity {
          meal.setRecurrence(Arrays.asList(recurrence));
          meal = service.events().insert(calendarId, meal).execute();
          System.out.print("Event created: %s\n", meal.getHtmlLink());
+         url = "http://httpbin.org/post";
+         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                 new Response.Listener<String>()
+                 {
+                     @Override
+                     public void onResponse(String response) {
+                         // response
+                         Log.d("Response", response);
+                     }
+                 },
+                 new Response.ErrorListener()
+                 {
+                     @Override
+                     public void onErrorResponse(VolleyError error) {
+                         // error
+                         Log.d("Error.Response", response);
+                     }
+                 }
+         ) {
+             @Override
+             protected Map<String, String> getParams()
+             {
+                 Map<String, String>  params = new HashMap<String, String>();
+                 params.put("name", "Alif");
+                 params.put("domain", "http://itsalif.info");
+
+                 return params;
+             }
+         };
+         queue.add(postRequest);
          //POST http://www.google.com/calendar/feeds/jo@gmail.com/private/full
      } */
+
 
 
 

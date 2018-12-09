@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Cal" pattern="CalendarScopes.CALENDAR||lib:*..*" />
-</component>
