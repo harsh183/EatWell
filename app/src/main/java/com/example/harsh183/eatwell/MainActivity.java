@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button browseFilesButton;
     private String calendarId;
-    private String icsFile;
+    private JSONObject icsFile;
     /** Default logging tag for messages from the main activity. */
     private static final String TAG = "Lab12:Main";
 
@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
+                            icsFile = response; //get actual ICS file
                             Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
@@ -126,13 +127,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             requestQueue.add(jsonObjectRequest);
-            icsFile = jsonObjectRequest.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-    public String getCalendar(String calendarIdInput) {
+    public JSONObject getCalendar(String calendarIdInput) {
         calendarId = calendarIdInput;
         startAPICall();
         return icsFile;
