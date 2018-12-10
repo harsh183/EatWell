@@ -74,22 +74,6 @@ public final class ICal {
         return schedule;
     }
 
-
-    /**
-     * gets calendar and turns it into one long string
-     * @param name
-     * @return name in string form
-     */
-    public static String getCalendar(String name) {
-        //when calling get calendar ask for file name
-        try {
-            return openFileInput(name).toString();
-        } catch(Exception e) {
-            System.out.println("File not found. Please retry.");
-            return "";
-        }
-    }
-
     /**
      * Helper function to convert the formatted string from the ics file
      *

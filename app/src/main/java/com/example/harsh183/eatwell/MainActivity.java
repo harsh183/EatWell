@@ -56,13 +56,6 @@ import java.time.LocalTime;
 public class MainActivity extends AppCompatActivity {
 
     Button browseFilesButton;
-    private String calendarId;
-    private JSONObject icsFile;
-    /** Default logging tag for messages from the main activity. */
-    private static final String TAG = "Lab12:Main";
-
-    /** Request queue for our network requests. */
-    private static RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,35 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    void startAPICall() {
-        try {
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.GET,
-                    "https://www.googleapis.com/calendar/" + calendarId + "/events",
-                    null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(final JSONObject response) {
-                            icsFile = response; //get actual ICS file
-                            Log.d(TAG, response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(final VolleyError error) {
-                    Log.w(TAG, error.toString());
-                }
-            });
-            requestQueue.add(jsonObjectRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-    }
-    public JSONObject getCalendar(String calendarIdInput) {
-        calendarId = calendarIdInput;
-        startAPICall();
-        return icsFile;
-    }
 
     /**
      * writes new event to the user's calendar using calculated times and dates
@@ -171,9 +136,4 @@ public class MainActivity extends AppCompatActivity {
          queue.add(postRequest);
          //POST http://www.google.com/calendar/feeds/jo@gmail.com/private/full
      } */
-
-
-
-
-
 }
