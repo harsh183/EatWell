@@ -17,6 +17,80 @@ public final class ICal {
     private static int MAX_MEAL_DURATION_MINUTES = 120; // Seems reasonable I guess
 
     /**
+     * Extracts the data out of the ical text into a 2d ArrayList.
+     *
+     * @param icalText string that has all the text from the ical text file
+     * @return A 2dArray list. The first level is the days of the week (MTWRF), the second level is
+     * just the events for that day.
+     */
+    private static SemesterSchedule extractEvents(String icalText) {
+        // TODO: Or use a lib for this later, but rn it seems tedious af
+        // TODO: Do something about these term dates, hardcoded for now
+        LocalDate startDate = LocalDate.of(2018, 8, 27);
+        LocalDate endDate = LocalDate.of(2018, 12, 12);
+        SemesterSchedule schedule = new SemesterSchedule(startDate, endDate);
+
+        // First break into lines (by newline characters)
+        String[] lines = icalText.split("\n");
+
+        // Loop through the lines, and set a flag and then look for remaining lines
+        // TODO: A better approach (idk if parsing as tree is worth it tho)
+        StudentEvent currentEvent = new StudentEvent();
+        boolean foundEvent = false;
+        for (String line: lines) {
+            if (line.contains("BEGIN:VEVENT")) {
+                currentEvent = new StudentEvent();
+                foundEvent = true;
+            }
+
+            if (line.contains("END:VEVENT")) {
+                foundEvent = false;
+                schedule.addEventToSchedule(currentEvent);
+            }
+
+            if (foundEvent) {
+                // Start time
+                if (line.contains("DTSTART;")) {
+                    // TODO: Remove this repetition
+                    String startTime = line.substring(line.length() - 7); // Last six chars
+                    currentEvent.startTime = convertStringToLocalTime(startTime);
+                }
+
+                // End time
+                if (line.contains("DTEND;")) {
+                    String endTime = line.substring(line.length() - 7); // Last six chars
+                    currentEvent.endTime = convertStringToLocalTime(endTime);
+                }
+
+                // Location
+                if (line.contains("LOCATION:")) {
+                    // TODO: Figure out if we have to change the location format later
+                    // TODO: A more elegant way to do this
+                    currentEvent.location = line.split("LOCATION:")[1];
+                }
+
+                // Weekdays
+                if (line.contains("BYDAY=")) {
+                    String[] extractedWeekDays = line.split("BYDAY=")[1].split(",");
+                    currentEvent.parseDaysOfWeek(extractedWeekDays);
+                }
+
+                // Start date
+                if (line.contains("DTSTART;")) {
+                    currentEvent.startDate = extractStartDate(line);
+                }
+
+                // End date
+                if (line.contains("UNTIL=")) {
+                    currentEvent.endDate = extractEndDate(line);
+                }
+            }
+        }
+
+        return schedule;
+    }
+
+    /**
      * Finds time blocks for meal timings.
      *
      * @param schedule Schedule of entire semester
@@ -128,80 +202,6 @@ public final class ICal {
         }
 
         return possibleIntervals;
-    }
-
-    /**
-     * Extracts the data out of the ical text into a 2d ArrayList.
-     *
-     * @param icalText string that has all the text from the ical text file
-     * @return A 2dArray list. The first level is the days of the week (MTWRF), the second level is
-     * just the events for that day.
-     */
-    private static SemesterSchedule extractEvents(String icalText) {
-        // TODO: Or use a lib for this later, but rn it seems tedious af
-        // TODO: Do something about these term dates, hardcoded for now
-        LocalDate startDate = LocalDate.of(2018, 8, 27);
-        LocalDate endDate = LocalDate.of(2018, 12, 12);
-        SemesterSchedule schedule = new SemesterSchedule(startDate, endDate);
-
-        // First break into lines (by newline characters)
-        String[] lines = icalText.split("\n");
-
-        // Loop through the lines, and set a flag and then look for remaining lines
-        // TODO: A better approach (idk if parsing as tree is worth it tho)
-        StudentEvent currentEvent = new StudentEvent();
-        boolean foundEvent = false;
-        for (String line: lines) {
-            if (line.contains("BEGIN:VEVENT")) {
-                currentEvent = new StudentEvent();
-                foundEvent = true;
-            }
-
-            if (line.contains("END:VEVENT")) {
-                foundEvent = false;
-                schedule.addEventToSchedule(currentEvent);
-            }
-
-            if (foundEvent) {
-                // Start time
-                if (line.contains("DTSTART;")) {
-                    // TODO: Remove this repetition
-                    String startTime = line.substring(line.length() - 7); // Last six chars
-                    currentEvent.startTime = convertStringToLocalTime(startTime);
-                }
-
-                // End time
-                if (line.contains("DTEND;")) {
-                    String endTime = line.substring(line.length() - 7); // Last six chars
-                    currentEvent.endTime = convertStringToLocalTime(endTime);
-                }
-
-                // Location
-                if (line.contains("LOCATION:")) {
-                    // TODO: Figure out if we have to change the location format later
-                    // TODO: A more elegant way to do this
-                    currentEvent.location = line.split("LOCATION:")[1];
-                }
-
-                // Weekdays
-                if (line.contains("BYDAY=")) {
-                    String[] extractedWeekDays = line.split("BYDAY=")[1].split(",");
-                    currentEvent.parseDaysOfWeek(extractedWeekDays);
-                }
-
-                // Start date
-                if (line.contains("DTSTART;")) {
-                    currentEvent.startDate = extractStartDate(line);
-                }
-
-                // End date
-                if (line.contains("UNTIL=")) {
-                    currentEvent.endDate = extractEndDate(line);
-                }
-            }
-        }
-
-        return schedule;
     }
 
     /**
