@@ -50,6 +50,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -69,6 +71,7 @@ import com.android.volley.toolbox.Volley;
 
 
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.Scanner;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Permissions for read and write (mostly off google docs)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
@@ -98,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Set up the queue for our API requests
+        requestQueue = Volley.newRequestQueue(this);
+
         browseFilesButton = findViewById(R.id.browse_button);
         browseFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("*/*");
                 startActivityForResult(intent, 666);
-                successMessage("Here so far");
             }
         });
 
@@ -113,61 +119,64 @@ public class MainActivity extends AppCompatActivity {
         generateScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                successMessage("Button clicked");
+                successMessage("Crunching your numbers on the server");
 
-                /*String url ="http://tgftp.nws.noaa.gov/data/raw/fz/fzus53.klot.srf.lot.txt";
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                successMessage("Woohoo got it!");
-                                Log.i(TAG, response);
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        successMessage(error.getMessage());
-                    }
-                });
+                String url ="http://10.0.2.2:4567"; //TODO: Replace with proper remote server later
 
-                // Add the request to the RequestQueue.
-                requestQueue.add(stringRequest);*/
-                String newICS = "testLine1\ntestLine2\ntestLine3\n";
-                File dir = new File ("/sdcard" + "/Download");
-                dir.mkdirs();
-                File file = new File(dir, "meals.ics");
-
-                // get external storage file reference
                 try {
-                    FileWriter writer = new FileWriter(file);
-                    // Writes the content to the file
-                    writer.write("This\n is\n an\n example\n");
-                    writer.flush();
-                    writer.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
-                }
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                            Request.Method.GET,
+                            url,
+                            null,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(final JSONObject response) {
+                                    successMessage("API request successful");
+                                    String mealTimeICS = null;
+                                    try {
+                                        mealTimeICS = response.get("result").toString();
+                                        Log.w(TAG, mealTimeICS);
+                                        File dir = new File ("/sdcard" + "/Download");
+                                        dir.mkdirs();
+                                        File file = new File(dir, "meals.ics");
 
-                successMessage("Check logs for file generated");
+                                        // get external storage file reference
+                                        try {
+                                            FileWriter writer = new FileWriter(file);
+                                            // Writes the content to the file
+                                            writer.write(mealTimeICS);
+                                            writer.flush();
+                                            writer.close();
+                                            successMessage("Success: Check Download folder");
+                                        } catch (IOException e) {
+                                            Log.e(TAG, e.getMessage());
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(final VolleyError error) {
+                            successMessage("Oh no");
+
+
+                            Log.e(TAG, error.toString());
+                        }
+                    });
+                    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                            30000,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    jsonObjectRequest.setShouldCache(false);
+                    requestQueue.add(jsonObjectRequest);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
 
-    }
-
-    /**
-     * Handle the response from our IP geolocation API.
-     *
-     * @param response response from our IP geolocation API.
-     */
-    void apiCallDone(final JSONObject response) {
-        try {
-            Log.d(TAG, response.toString(2));
-            // Example of how to pull a field off the returned JSON object
-
-        } catch (JSONException ignored) {
-            Log.e(TAG, ignored.getMessage());
-        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
@@ -184,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    successMessage("Here");
+                    successMessage("File read successful");
                     //Log.d(TAG, "LINE: " + line);
                     text.append(line);
                     text.append('\n');
