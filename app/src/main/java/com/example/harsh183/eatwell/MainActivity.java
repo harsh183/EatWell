@@ -31,6 +31,8 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -46,18 +48,19 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-/*import com.android.volley.Request;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;*/
+import com.android.volley.toolbox.Volley;
 
 
 //best project ever
@@ -66,10 +69,15 @@ import com.android.volley.toolbox.Volley;*/
 import java.time.LocalTime;
 import java.util.Scanner;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "EatWell:Main";
 
     Button browseFilesButton;
+    Button generateScheduleButton;
+
+    /** Request queue for our API requests. */
+    private static RequestQueue requestQueue;
 
     String icsFile;
 
@@ -77,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        requestQueue = Volley.newRequestQueue(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -95,7 +104,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        generateScheduleButton = findViewById(R.id.generate);
+        generateScheduleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                successMessage("Button clicked");
 
+                String url ="http://localhost:4567/";
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.i(TAG, response);
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //successMessage("Oof that didn't work");
+                    }
+                });
+
+// Add the request to the RequestQueue.
+                requestQueue.add(stringRequest);
+                successMessage("Check logs for file generated");
+            }
+        });
+
+
+    }
+
+    /**
+     * Handle the response from our IP geolocation API.
+     *
+     * @param response response from our IP geolocation API.
+     */
+    void apiCallDone(final JSONObject response) {
+        try {
+            Log.d(TAG, response.toString(2));
+            // Example of how to pull a field off the returned JSON object
+
+        } catch (JSONException ignored) {
+            Log.e(TAG, ignored.getMessage());
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
@@ -113,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
                 while ((line = br.readLine()) != null) {
                     successMessage("Here");
-                    Log.d(TAG, "LINE: " + line);
+                    //Log.d(TAG, "LINE: " + line);
                     text.append(line);
                     text.append('\n');
                 }
