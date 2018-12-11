@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -85,11 +87,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        requestQueue = Volley.newRequestQueue(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+            }
+
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
             }
         }
 
@@ -110,22 +115,39 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 successMessage("Button clicked");
 
-                String url ="http://localhost:4567/";
+                /*String url ="http://tgftp.nws.noaa.gov/data/raw/fz/fzus53.klot.srf.lot.txt";
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                successMessage("Woohoo got it!");
                                 Log.i(TAG, response);
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //successMessage("Oof that didn't work");
+                        successMessage(error.getMessage());
                     }
                 });
 
-// Add the request to the RequestQueue.
-                requestQueue.add(stringRequest);
+                // Add the request to the RequestQueue.
+                requestQueue.add(stringRequest);*/
+                String newICS = "testLine1\ntestLine2\ntestLine3\n";
+                File dir = new File ("/sdcard" + "/Download");
+                dir.mkdirs();
+                File file = new File(dir, "meals.ics");
+
+                // get external storage file reference
+                try {
+                    FileWriter writer = new FileWriter(file);
+                    // Writes the content to the file
+                    writer.write("This\n is\n an\n example\n");
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
                 successMessage("Check logs for file generated");
             }
         });
