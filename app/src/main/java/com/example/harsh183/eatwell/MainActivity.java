@@ -34,7 +34,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
-import com.android.volley.Request;
+/*import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -45,7 +45,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.toolbox.Volley; */
 
 
 //best project ever
@@ -67,10 +67,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
-                startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                startActivityForResult(intent, 666);
+            }
+
+            protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+                if (requestCode == 666) {
+                    String Fpath = data.getDataString();
+                    // do somthing...
+                }
             }
         });
 

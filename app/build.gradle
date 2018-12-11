@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.harsh183.eatwell"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -36,6 +36,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.volley:volley:1.1.1'
-    compile 'com.google.apis:google-api-services-calendar:v3-rev361-1.25.0'
+    api 'com.google.apis:google-api-services-calendar:v3-rev361-1.25.0'
 
 }
