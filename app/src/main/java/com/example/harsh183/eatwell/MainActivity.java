@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void successMessage (String successStatus) {
         Toast toast = Toast.makeText(getApplicationContext(), successStatus, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.TOP|Gravity.START, 170, 230);
+        toast.setGravity(Gravity.TOP|Gravity.START, 400, 1000);
         toast.show();
     }
 
