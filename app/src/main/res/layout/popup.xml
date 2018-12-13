@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_gravity="center"
+    android:background="#bee7da">
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="30dp"
+        android:text=
+            " 1) On your computer, open Google Calendar. You can't export events from the Google Calendar app.
+            \n 2) Find the 'My calendars' section. Hover over the calendar you want to export, click 'More', then 'Settings and sharing'.
+            \n 3) Under 'Calendar settings,' click Export calendar.
+            \n 4) An ICS file of your events will start downloading.
+            \n 5) Send file to your phone and upload to EatWell. "
+        android:textSize="22sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        />
+</RelativeLayout>
