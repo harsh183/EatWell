@@ -121,18 +121,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 successMessage("Crunching your numbers on the server");
 
-                String url ="http://10.0.2.2:4567"; //TODO: Replace with proper remote server later
-
+                String url ="http://10.0.2.2:4567/"; //TODO: Replace with proper remote server later
                 try {
+                    JSONObject jsonPayload = new JSONObject()
+                            .put("content", icsFile);
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                            Request.Method.GET,
+                            Request.Method.POST,
                             url,
-                            null,
+                            jsonPayload,
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(final JSONObject response) {
                                     successMessage("API request successful");
-                                    String mealTimeICS = null;
+                                    String mealTimeICS;
                                     try {
                                         mealTimeICS = response.get("result").toString();
                                         Log.w(TAG, mealTimeICS);
