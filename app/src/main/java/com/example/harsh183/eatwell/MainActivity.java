@@ -1,10 +1,14 @@
 package com.example.harsh183.eatwell;
 
 // TODO: Cleanup imports
+import java.io.InputStream;
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
@@ -109,9 +113,29 @@ public class MainActivity extends AppCompatActivity {
         browseFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                startActivityForResult(intent, 666);
+
+                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //intent.setType("*/*");
+                //startActivityForResult(intent, 666);
+
+
+
+                    // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+                    // browser.
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+                    // Filter to only show results that can be "opened", such as a
+                    // file (as opposed to a list of contacts or timezones)
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                    // Filter to show only images, using the image MIME data type.
+                    // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+                    // To search for all documents available via installed storage providers,
+                    // it would be "*/*".
+                    intent.setType("*/*");
+
+                    startActivityForResult(intent, 666);
+
             }
         });
 
@@ -182,20 +206,18 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
         if (requestCode == 666) {
-            String Fpath = data.getDataString();
-            successMessage("Found file " + Fpath);
-            File newFile = new File("/sdcard/Download/Fall 2018 - Urbana-Champaign.ics"); // TODO: Replace hardcode
-
-            //Read text from file
             StringBuilder text = new StringBuilder();
-
             try {
-                BufferedReader br = new BufferedReader(new FileReader(newFile));
+                //Read text from file
+                Uri fileUri = data.getData();
+                InputStream inputStream = getContentResolver().openInputStream(fileUri);
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
                 String line;
 
                 while ((line = br.readLine()) != null) {
                     successMessage("File read successful");
-                    //Log.d(TAG, "LINE: " + line);
+                    Log.d(TAG, "LINE: " + line);
                     text.append(line);
                     text.append('\n');
                 }
@@ -213,5 +235,4 @@ public class MainActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.START, 400, 1000);
         toast.show();
     }
-
 }
