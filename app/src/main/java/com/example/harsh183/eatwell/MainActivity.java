@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.app.Activity;
@@ -23,6 +25,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -200,8 +204,27 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
+        Button googleCal = findViewById(R.id.source_calendar);
+        googleCal.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //layout inflater make xml file "popup" into view objects
+                LayoutInflater layoutInflation = (LayoutInflater)
+                        getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popup = layoutInflation.inflate(R.layout.popup, null);
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                final PopupWindow popupWindow = new PopupWindow(popup, width, height, true);
+                popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+                //if you tap anywhere on the screen this part will make the popup go away
+                popup.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        popupWindow.dismiss();
+                        return true;
+                    }
+                });
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
@@ -232,7 +255,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void successMessage (String successStatus) {
         Toast toast = Toast.makeText(getApplicationContext(), successStatus, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.TOP|Gravity.START, 400, 1000);
+        toast.setGravity(Gravity.TOP|Gravity.START, 300, 1000);
+
         toast.show();
     }
+    /**
+     * LayoutInflater inflater = (LayoutInflater)
+     *                         getSystemService(LAYOUT_INFLATER_SERVICE);
+     *                 View popupView = inflater.inflate(R.layout.popup, null);
+     *
+     *                 int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+     *                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+     *                 boolean focusable = true;
+     *                 final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+     *
+     *                 popupView.setOnTouchListener(new View.OnTouchListener() {
+     *                     @Override
+     *                     public boolean onTouch(View x, MotionEvent event) {
+     *                         popupWindow.dismiss();
+     *                         return true;
+     *                     }
+     *                 });
+     */
+
+
 }
