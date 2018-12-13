@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -89,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
     Button browseFilesButton;
     Button generateScheduleButton;
 
+    CheckBox breakfastOption;
+    CheckBox lunchOption;
+    CheckBox dinnerOption;
+
     /** Request queue for our API requests. */
     private static RequestQueue requestQueue;
 
@@ -113,32 +118,30 @@ public class MainActivity extends AppCompatActivity {
         // Set up the queue for our API requests
         requestQueue = Volley.newRequestQueue(this);
 
+        // Meal option buttons
+        breakfastOption = findViewById(R.id.meal_breakfast);
+        lunchOption = findViewById(R.id.meal_lunch);
+        dinnerOption = findViewById(R.id.meal_dinner);
+
         browseFilesButton = findViewById(R.id.browse_button);
         browseFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+                // browser.
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 
-                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //intent.setType("*/*");
-                //startActivityForResult(intent, 666);
+                // Filter to only show results that can be "opened", such as a
+                // file (as opposed to a list of contacts or timezones)
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
 
+                // Filter to show only images, using the image MIME data type.
+                // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+                // To search for all documents available via installed storage providers,
+                // it would be "*/*".
+                intent.setType("*/*");
 
-
-                    // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
-                    // browser.
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-
-                    // Filter to only show results that can be "opened", such as a
-                    // file (as opposed to a list of contacts or timezones)
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-                    // Filter to show only images, using the image MIME data type.
-                    // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-                    // To search for all documents available via installed storage providers,
-                    // it would be "*/*".
-                    intent.setType("*/*");
-
-                    startActivityForResult(intent, 666);
+                startActivityForResult(intent, 666);
 
             }
         });
@@ -147,12 +150,25 @@ public class MainActivity extends AppCompatActivity {
         generateScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Acquire the meal options
+
                 successMessage("Crunching your numbers on the server");
 
                 String url ="http://10.0.2.2:4567/"; //TODO: Replace with proper remote server later
                 try {
+                    /*JSONObject mealTimings = new JSONObject().
+                            put("breakfast", breakfastOption.isChecked())
+                            .put("lunch", lunchOption.isChecked())
+                            .put("dinner", dinnerOption.isChecked());*/
+
+                    Log.e(TAG,"Dinner box" + dinnerOption.isChecked());
                     JSONObject jsonPayload = new JSONObject()
+                            .put("breakfast", breakfastOption.isChecked())
+                            .put("lunch", lunchOption.isChecked())
+                            .put("dinner", dinnerOption.isChecked())
                             .put("content", icsFile);
+                            //.put("meals", mealTimings.toString());
+                    Log.e(TAG, "Json body is " + jsonPayload.toString());
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                             Request.Method.POST,
                             url,
@@ -188,8 +204,6 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(final VolleyError error) {
                             successMessage("Oh no");
-
-
                             Log.e(TAG, error.toString());
                         }
                     });
@@ -237,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
                 String line;
-
                 while ((line = br.readLine()) != null) {
                     successMessage("File read successful");
                     Log.d(TAG, "LINE: " + line);
